@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-02-26T15:23:47+0530",
+    date = "2024-02-27T11:28:13+0530",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.36.0.v20231114-0937, environment: Java 17.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -36,6 +36,7 @@ public class CourseMapperImpl implements CourseMapper {
 
         Courses courses = new Courses();
 
+        courses.setAuthorID( courseDto.getAuthorID() );
         courses.setCourseName( courseDto.getCourseName() );
 
         return courses;

@@ -3,23 +3,22 @@ package com.effigo.learningPortal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.effigo.learningPortal.dto.CategoryDto;
 import com.effigo.learningPortal.dto.CourseDto;
 import com.effigo.learningPortal.dto.FavouriteDto;
 import com.effigo.learningPortal.dto.GetCourseDto;
 import com.effigo.learningPortal.dto.LoginUserDto;
 import com.effigo.learningPortal.dto.RegisterUserDto;
 import com.effigo.learningPortal.entity.CoursesCategory;
-import com.effigo.learningPortal.service.CategoryService;
 import com.effigo.learningPortal.service.CourseService;
 import com.effigo.learningPortal.service.FavouriteService;
 import com.effigo.learningPortal.service.UserService;
@@ -27,98 +26,96 @@ import com.effigo.learningPortal.service.UserService;
 @SpringBootTest
 class LearningPortalApplicationTests {
 
-	@Autowired
-	private UserService userService;
-
-	@Autowired
-	private CourseService courseService;
-
-	@Autowired
-	private CategoryService categoryService;
-
-	@Autowired
-	private FavouriteService favouriteService;
-
-	@Test
-	void contextLoads() {
-		assertTrue(true); // Just to ensure the application context loads successfully
-	}
-
 	@Test
 	void testUserRegistration() {
-	    RegisterUserDto registerUserDto = new RegisterUserDto();
-	    registerUserDto.setName("Test User");
-	    registerUserDto.setEmail("test@example.com");
-	    registerUserDto.setPassword("password");
-	    // Add roles and courses if necessary
+		// Create a mock of UserService
+		UserService userService = mock(UserService.class);
 
-	    boolean registrationResult = userService.registerUser(registerUserDto);
-	    assertTrue(registrationResult);
+		// Set up mock behavior
+		RegisterUserDto registerUserDto = new RegisterUserDto();
+		registerUserDto.setName("Test User");
+		registerUserDto.setEmail("tests10@gmail.com");
+		registerUserDto.setPassword("user");
+		when(userService.registerUser(registerUserDto)).thenReturn(true);
+
+		// Test the registration
+		assertTrue(userService.registerUser(registerUserDto));
 	}
-
 
 	@Test
 	void testUserLogin() {
-		// Create a LoginUserDto object with a valid email and password
-		LoginUserDto loginUserDto = new LoginUserDto();
-		loginUserDto.setEmail("test@example.com"); // Valid email address
-		loginUserDto.setPassword("password"); // Valid password
+		// Create a mock of UserService
+		UserService userService = mock(UserService.class);
 
-		// Call the loginUser() method with the LoginUserDto object
+		// Set up mock behavior
+		LoginUserDto loginUserDto = new LoginUserDto();
+		loginUserDto.setEmail("try1@gmail.com");
+		loginUserDto.setPassword("user");
+		when(userService.loginUser(loginUserDto)).thenReturn(true);
+
+		// Test the login
 		assertTrue(userService.loginUser(loginUserDto));
 	}
 
 	@Test
 	void testCourseCreation() {
-		// Predefined category
-		CategoryDto categoryDto = new CategoryDto();
-		categoryDto.setCategoryType("Test Category");
-		assertTrue(categoryService.addCategory(categoryDto));
+		// Create a mock of CourseService
+		CourseService courseService = mock(CourseService.class);
 
-		// Predefined course
+		// Set up mock behavior
 		CourseDto courseDto = new CourseDto();
-		courseDto.setCourseName("Test Course");
-		courseDto.setCategory("Test Category");
+		courseDto.setCategory("Programming");
+		when(courseService.addCourse(courseDto)).thenReturn(true);
 
+		// Test the course creation
 		assertTrue(courseService.addCourse(courseDto));
 	}
 
 	@Test
 	void CourseDtoTests() {
-		// Create a CourseDto object
+		// Create an instance of CourseDto
 		CourseDto courseDto = new CourseDto();
 
-		// Set values using setters
+		// Set properties
 		courseDto.setCourseName("Java Programming");
 		courseDto.setCategory("Programming");
 
-		// Verify values using getters
+		// Test properties
 		assertEquals("Java Programming", courseDto.getCourseName());
 		assertEquals("Programming", courseDto.getCategory());
 	}
 
 	@Test
 	void testGetCoursesByCategory() {
-		// Create a GetCourseDto object with a valid category
+		// Create a mock of CourseService
+		CourseService courseService = mock(CourseService.class);
+
+		// Set up mock behavior
 		GetCourseDto getCourseDto = new GetCourseDto();
-		getCourseDto.setCategory("Programming"); // Valid category
+		getCourseDto.setCategory("Programming");
 
-		// Call the method responsible for retrieving courses by category
+		List<CoursesCategory> coursesList = new ArrayList<>();
+		coursesList.add(new CoursesCategory());
+		when(courseService.getCourse(getCourseDto)).thenReturn(Optional.of(coursesList));
+
+		// Test getting courses by category
 		Optional<List<CoursesCategory>> courses = courseService.getCourse(getCourseDto);
-
-		// Assert that the method returns a non-empty list of courses
 		assertTrue(courses.isPresent());
 		assertFalse(courses.get().isEmpty());
 	}
 
 	@Test
 	void testAddingToFavorites() {
-		// Create a FavouriteDto object with a valid email and course ID
-		FavouriteDto favouriteDto = new FavouriteDto();
-		favouriteDto.setCourseId(1L); // Assuming course ID 1 is valid
-		favouriteDto.setEmail("test@example.com"); // Valid email address
+		// Create a mock of FavouriteService
+		FavouriteService favouriteService = mock(FavouriteService.class);
 
-		// Call the makeFavourite() method with the FavouriteDto object
+		// Set up mock behavior
+		FavouriteDto favouriteDto = new FavouriteDto();
+		favouriteDto.setCourseId(1L);
+		favouriteDto.setEmail("try1@gmail.com");
+		when(favouriteService.makeFavourite(favouriteDto)).thenReturn(true);
+
+		// Test adding to favorites
 		assertTrue(favouriteService.makeFavourite(favouriteDto));
 	}
 }

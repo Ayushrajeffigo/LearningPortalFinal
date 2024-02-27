@@ -1,8 +1,7 @@
 package com.effigo.learningPortal.service;
 
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.effigo.learningPortal.dto.LoginUserDto;
 import com.effigo.learningPortal.dto.RegisterUserDto;
@@ -15,41 +14,48 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-@Transactional
-
 public class UserService {
 
 	private final UserRepository userRepository;
-
 	private final RoleRepository roleRepository;
-
 	private final UserMapper userMapper;
 
 	public UserService(UserRepository userRepository, RoleRepository roleRepository, UserMapper userMapper) {
-		super();
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.userMapper = userMapper;
 	}
 
+	@Transactional
 	public boolean registerUser(RegisterUserDto registerUserDto) {
 		try {
-			User user = userMapper.registerUserDtoToUser(registerUserDto);
-			userRepository.save(user);
-			return true; // Registration successful
+			// Check if a user with the same email already exists
+			if (userRepository.existsByEmail(registerUserDto.getEmail())) {
+				log.warn("User with email {} already exists.", registerUserDto.getEmail());
+				return false; // User already exists, registration failed
+			} else {
+
+				User user = userMapper.registerUserDtoToUser(registerUserDto);
+				userRepository.save(user);
+				return true; // Registration successful
+			}
 		} catch (Exception e) {
-			// Log the exception or handle it according to your application's logic
+			log.error("Error occurred during user registration.", e);
 			return false; // Registration failed
 		}
 	}
 
+	@Transactional(readOnly = true)
 	public boolean loginUser(LoginUserDto loginUser) {
-
 		try {
 			User user = userRepository.findThroughEmail(loginUser.getEmail());
-			RegisterUserDto userDetails = userMapper.userToRegisterUserDto(user);
+			if (user == null) {
+				log.warn("User not found with email: {}", loginUser.getEmail());
+				return false;
+			}
 
-			if (userDetails == null || userDetails.getPassword().equals(loginUser.getPassword())) {
+			RegisterUserDto userDetails = userMapper.userToRegisterUserDto(user);
+			if (userDetails.getPassword().equals(loginUser.getPassword())) {
 				log.info("User logged in successfully: {}", loginUser.getEmail());
 				return true;
 			} else {
