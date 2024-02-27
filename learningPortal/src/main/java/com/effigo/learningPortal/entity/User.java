@@ -36,7 +36,10 @@ public class User {
 
 	@Column(name = "password")
 	private String password;
-
+	// CascadeType.ALL means that all operations (persist, merge, remove, refresh)
+	// This specifies the fetch strategy for the association. In this case, EAGER
+	// loading means that when an entity of this type is loaded, its associated
+	// entities will also be loaded eagerly
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 	private Set<Role> roles = new HashSet<>();
